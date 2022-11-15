@@ -1,0 +1,196 @@
+#Integrantes: Lizeth Flores y Ornella Quero
+
+#Directorio de trabajo
+setwd("C:/Users/Ornella Quero/OneDrive/Documentos")
+
+###Instalar paquete
+install.packages("modeest")
+
+#Paquetes
+library(haven) #tablas de datos en otros formatos (spss, stata, etc.)
+library(tidyverse) #procesamiento de datos
+library(sjmisc) #tablas de frecuencias ordenadas
+library(sjPlot)
+library(modeest)
+
+#Abrir base de datos
+data=read_dta("base_85.dta")
+
+#Exploraci?n base de datos 
+View(data) #ver base de datos
+dim(data) #ver filas (casos) y columnas (variables)
+names(data) #ver nombres de las variables
+
+
+#2.Objetivo general
+#Identificar de qu? manera var?a la percepci?n del progreso actual del pa?s seg?n la
+#postura pol?tica de los chilenos encuestados de 18 a?os o m?s, en el mes de agosto de 2021.
+
+
+#3.Nivel de medici?n de las variables 
+#Identificaci?n pol?tica:Nominal
+#Percepci?n de progreso actual:Ordinal
+#Sexo:Nominal
+#Edad: Intervalar
+#Nivel educacional:Ordinal
+
+
+#4.Tablas de frecuencia sexo, edad y nivel educacional, NA y etiquetas seg?n corresponda
+#Sexo
+table(data$sexo)
+frq(data$sexo, out = "viewer")
+
+#Poner etiquetas (sexo)
+data$sexo = factor(data$sexo, levels=c(1:2), lebels=c("Hombre", "Mujer")
+                   
+#Tablas con etiquetas (sexo)
+table(data$sexo)
+prop.table(table(data$sexo))
+prop.table(table(data$sexo))*100                 
+ 
+           
+###Edad                             
+table(data$edad)
+table(data$edad, exclude = F) 
+frq(data$edad, out = "viewer") 
+
+#Asignar valores perdidos
+data$edad <- na_if(data$edad, 9) 
+
+
+###Nivel educacional
+table(data$esc_nivel_1)
+table(data$esc_nivel_1, exclude = F)
+frq(data$esc_nivel_1, out = "viewer")
+
+#Poner etiquetas (nivel educacional)
+data$esc_nivel_1 = factor(data$esc_nivel_1, levels=c(1:11), lebels=c("Sin estudios formales",
+                                                     "B?sica incompleta", "B?sica completa",
+                                                     "Media cientifico humanista o t?cnico profesional incompleto",
+                                                     "Media cientifico humanista o t?cnico profesional completo",
+                                                     "Instituto t?cnico incompleto", "Instituto t?cnico completo",
+                                                     "Universitaria incompleta", "Universitaria completa",
+                                                     "Postgrado incompleta", "Postgrado completa"))
+
+#Asignar valores perdidos
+data$esc_nivel_1 <- na_if(data$esc_nivel_1, 99) 
+table(data$esc_nivel_1, exclude = F) 
+
+
+#Ver tabla 
+table(data$esc_nivel_1)
+prop.table(table(data$esc_nivel_1))*100
+frq(data$esc_nivel_1, out = "viewer") 
+
+### Interpretaci?n:La mayor?a de encuestadas son mujeres con un 51,8% mientras que un 48,2% son hombres, siendo un diferencia
+### irrelevante para el an?lisis ya que son s?lo 3 puntos aprox. En tanto a la edad, el 50% tiene igual o menor a 49 a?os,
+### estando el otro 50% de encuestados entre los 50 y los 95 a?os. En nivel educacional es el mismo porcentaje (12%) de personas 
+### con b?sica incompleta y completa. Por otra parte, el 29% de los encuestados, la mayor?a, tiene la media cientifica humanista
+### o media t?cnica profesional completa. Por ?ltimo, las personas con postgrado incompleto y completo son la minor?a con un 0,69% 
+### y 0,35% resperctivamente. 
+
+
+
+#####5.Recodificar variable percepci?n de progreso actual (precepcion_4)
+summary(data$percepcion_4)
+
+###Recodificar percepci?n, Chile est?: (avanzando y retrocediendo),
+data <- mutate(data, percepcion_4 = case_when(
+  percepcion_4>=2 & percepcion_4<=3~"retrocediendo",
+  percepcion_4==1~"avanzando",
+  TRUE ~ NA_character_
+))
+
+#Ver tabla con variable recodificada
+table(data$percepcion_4)
+frq(data$percepcion_4, out = "viewer")
+
+
+###Justifcaci?n: El primer atributo se recodific? en "avanzando" ya que recoge los valores de "progresando" y no cambia
+### el significado de las respuestas que dieron los participantes. Por otra parte, "estancado" y "en decadencia" se recodific?
+### en la etiqueta "retrocediendo" ya que ?sta es representativa con los dos atributos anteriores. Mantuvimos los NA porque no 
+### nos intersan para hacer el an?lisis.
+
+
+###6. Estad?sticos descriptivos
+
+##Moda
+mlv(data$percepcion_4, method = "mfv", na.rm = T) 
+###El atributo que m?s se repite es "retrocediendo", el cual ser?a la moda. Elegimos la moda porque al estar recodificada como
+###variable nominal es el estadistico descriptivo que se nos permite sacar.
+
+#tabla de frecuencia
+table(data$percepcion_4)
+prop.table(table(data$percepcion_4))
+prop.table(table(data$percepcion_4))*100
+frq(data$percepcion_4, out="viewer")
+
+
+
+####7.Recodifique la variable iden_pol_2 en una nueva variable de 4 categor?as:
+summary(data$iden_pol_2)
+
+data <- mutate(data, iden_pol_2 = case_when(iden_pol_2>=1 & iden_pol_2<=2~"izquierda",
+                                            iden_pol_2>=3 & iden_pol_2<=4~"centro izquierda",
+                                            iden_pol_2>=5 & iden_pol_2<=6~"centro",
+                                            iden_pol_2>=7 & iden_pol_2<=8~"centro derecha",
+                                            iden_pol_2>=9 & iden_pol_2<=10~"derecha",
+                                            TRUE ~  NA_character_))
+
+
+
+#tablas
+table(data$iden_pol_2)
+table(data$iden_pol_2, exclude = F)
+prop.table(table(data$iden_pol_2))*100
+frq(data$iden_pol_2, out ="viewer")
+
+###Justificaci?n: Decidimos recofidicar en estas 5 variables ya que son representativas de la escala de orientaci?n pol?tica en la cual se
+### guiaron los encuestados para contestar. De esta manera, las 5 categor?a resumen de forma simplificada lo que piensa la gente respecto a
+###su orientaci?n pol?tica.Los NA los dejamos tal cual porque no nos sirven para nuestro an?lisis.
+
+
+###8.Estad?sticos descriptivos
+
+##Moda
+mlv(data$iden_pol_2, method = "mfv", na.rm = T)
+#El atributo m?s repetido es el de no sabe y no contesta, es decir, los NA con 527 respuestas.
+#No se puede utilizar ning?n otro estad?stico descriptivo ya que se recodific? la variable de ordinal a nominal.
+
+#Tabla de frecuencia
+table(data$iden_pol_2)
+prop.table(table(data$iden_pol_2))
+prop.table(table(data$iden_pol_2))*100
+frq(data$iden_pol_2, out="viewer")
+
+###9.An?lisis bivariado de las variables recodificadas
+
+#tabla de contingencia: identificaci?n pol?tica x percepci?n 
+table(data$percepcion_4, data$iden_pol_2)
+
+##tabla m?s ordenada
+sjt.xtab(data$percepcion_4, data$iden_pol_2)
+
+##Porcentaje  fila 
+sjt.xtab(data$percepcion_4, data$iden_pol_2, show.row.prc=TRUE)
+
+###Porcentaje columna
+sjt.xtab(data$percepcion_4, data$iden_pol_2, show.col.prc=TRUE)
+
+### An?lisis. Encuesta CEP N?85, 2021. Identificaci?n pol?tica x percepci?n situaci?n actual del pa?s:
+### De las personas que respondieron la encuesta (sin considerar NA), la mayor?a declar? identificarse con la postura pol?tica de centro
+### con un 53,5%. Le siguen el 14,9%  que se considera de centro izquiera y el 10,8% de izquierda. De esta manera, los porcentajes m?s
+### bajos de la muestra son las personas de centro derecha con 12,9% y de derecha con un 7,9%. Aproximadamente el 80%  de las personas 
+### que se identifican con la postura pol?tica de centro piensan que el pa?s est? retrocediendo. Esta creenc?a, del pa?s retrocediendo, 
+### predomina en todas las posturas pol?ticas, siendo la m?s alta en las personas de centro izquiera con un 87,5%, seguido con un 85,7% 
+### de los  sujetos que se identifican con la izquierda. Las personas de centro derecha y derecha piensan que el pa?s est? retrocediendo
+### en un 79,2% y 69,2% respectivamente. A pesar de que son porcentajes menores a los de las personas de centro, centro izquierda e izquierda
+### sigue prevaleciendo mayoritariamente la idea de que el pa?s est? retrocediendo. En conclusi?n, la mayor?a de los encuestados pudo haber 
+### opinado que el pa?s estaba retrocediendo debido a los efectos de la pandemia y al gobierno mal gestionado de Sebasti?n Pi?era.
+
+
+
+
+
+
+

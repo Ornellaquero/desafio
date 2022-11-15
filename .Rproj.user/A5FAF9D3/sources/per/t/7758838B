@@ -1,0 +1,26 @@
+{
+    "id": "7758838B",
+    "path": "~/GitHub/03-tarea-Rproj/R/01-proc.R",
+    "project_path": null,
+    "type": "r_source",
+    "hash": "1213305007",
+    "contents": "",
+    "dirty": false,
+    "created": 1668485052461.0,
+    "source_on_save": false,
+    "relative_order": 7,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "110,0",
+        "scrollLine": "102"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1668488542,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1668488542239,
+    "read_only": false,
+    "read_only_alternatives": []
+}
